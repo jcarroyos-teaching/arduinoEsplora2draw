@@ -3,7 +3,7 @@ import { SerialPort } from "serialport";
 import { ReadlineParser } from "@serialport/parser-readline";
 
 // Replace with your serial port path
-const port = new SerialPort({ path: "COM3", baudRate: 9600 });
+const port = new SerialPort({ path: "/dev/tty.usbmodem14101", baudRate: 9600 });
 const parser = port.pipe(new ReadlineParser());
 
 // Variable to store the last complete line of data
@@ -43,5 +43,26 @@ export const getSerialData = api(
       return { data: { error: "Serial port is not open" } };
     }
     return { data: lastLine };
+  }
+);
+
+// Define the new Encore endpoint to send data to the Arduino Esplora
+export const sendDataToEsplora = api(
+  {
+    expose: true,
+    method: "POST",
+    path: "/api/send-data",
+  },
+  async (): Promise<Response> => {
+    const dataToSend = ["Do", "Re", "Mi", "Fa"].join(",");
+    if (!port.isOpen) {
+      return { data: { error: "Serial port is not open" } };
+    }
+    port.write(dataToSend + "\n", (err) => {
+      if (err) {
+        console.error("Error on write: ", err.message);
+      }
+    });
+    return { data: "Data sent to Arduino Esplora" };
   }
 );
