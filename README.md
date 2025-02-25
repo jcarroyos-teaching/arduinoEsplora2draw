@@ -4,6 +4,12 @@
 
 ## Instructions
 
+Before running the scripts, make sure they are executable. You can do this by running:
+
+```sh
+chmod +x play.sh stop.sh
+```
+
 To run the project, use the `play.sh` script. This script will start all necessary services.
 
 ```sh
