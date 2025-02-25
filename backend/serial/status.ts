@@ -3,7 +3,8 @@ import { SerialPort } from "serialport";
 import { ReadlineParser } from "@serialport/parser-readline";
 
 // Replace with your serial port path
-const port = new SerialPort({ path: "COM3", baudRate: 9600 });
+// const port = new SerialPort({ path: "COM3", baudRate: 9600 }); // Windows
+const port = new SerialPort({ path: "/dev/tty.usbmodem14101", baudRate: 9600 }); // macOS
 const parser = port.pipe(new ReadlineParser());
 
 // Variable to store the last complete line of data
