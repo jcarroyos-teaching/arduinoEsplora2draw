@@ -25,16 +25,16 @@ const CanvasComponent: React.FC<CanvasProps> = ({ joystickX, joystickY, slider, 
 
   // Update line width based on slider value
   useEffect(() => {
-    // Map slider (0-1023) to a reasonable line width (1-20)
-    const newLineWidth = Math.max(1, Math.min(20, Math.floor(slider / 50)));
+    // Map slider (0-1023) to a larger line width range (1-50)
+    const newLineWidth = Math.max(1, Math.min(50, Math.floor(slider / 20.46)));
     setLineWidth(newLineWidth);
   }, [slider]);
 
   // Update color based on light value
   useEffect(() => {
-    // Map light (0-1023) to hue (0-360)
-    const hue = Math.floor((light / 1023) * 360);
-    setColor(`hsl(${hue}, 100%, 50%)`);
+    const alpha = light / 1023;
+    const newColor = `rgba(0, 255, 0, ${alpha})`;
+    setColor(newColor);
   }, [light]);
 
   // Drawing logic
