@@ -18,8 +18,13 @@ const CanvasComponent: React.FC<CanvasProps> = ({ joystickX, joystickY, slider, 
   // Convert joystick values to canvas coordinates
   const mapJoystickToCanvas = (canvas: HTMLCanvasElement) => {
     // Map joystick values (typically -512 to 512) to canvas dimensions
-    const x = ((joystickX + 512) / 1024) * canvas.width;
-    const y = ((joystickY + 512) / 1024) * canvas.height;
+    let x = ((joystickX + 512) / 1024) * canvas.width;
+    let y = ((joystickY + 512) / 1024) * canvas.height;
+
+    // Clamp the coordinates within the canvas boundaries
+    x = Math.max(0, Math.min(canvas.width, x));
+    y = Math.max(0, Math.min(canvas.height, y));
+
     return { x, y };
   };
 

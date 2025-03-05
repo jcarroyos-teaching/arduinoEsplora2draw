@@ -118,8 +118,11 @@ const DataFetcher: React.FC<DataFetcherProps> = ({ onDataFetched }) => {
                 button4
               ] = values;
               
-              // Adjust joystick X value to map correctly
-              joystickX = -joystickX;
+              // Apply offset to joystick values
+              const offsetX = -92;  // Adjust this value based on observed drift
+              const offsetY = 115; // Adjust this value based on observed drift
+              joystickX = -joystickX - offsetX;
+              joystickY = joystickY - offsetY;
               
               onDataFetched(
                 joystickX,
