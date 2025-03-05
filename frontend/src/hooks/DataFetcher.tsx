@@ -89,7 +89,6 @@ const DataFetcher: React.FC<DataFetcherProps> = ({ onDataFetched }) => {
         socketRef.current = socket;
         
         socket.onopen = () => {
-          console.log("WebSocket connection established");
           setIsConnected(true);
           setErrorMessage(null);
         };
@@ -98,7 +97,6 @@ const DataFetcher: React.FC<DataFetcherProps> = ({ onDataFetched }) => {
           try {
             // Parse comma-separated string instead of JSON
             const values = event.data.split(',').map(value => parseInt(value, 10));
-            console.log("Received WebSocket data:", values);
             
             // Check if we received the expected number of values
             if (values.length === 13 && values.every(v => !isNaN(v))) {
@@ -143,7 +141,6 @@ const DataFetcher: React.FC<DataFetcherProps> = ({ onDataFetched }) => {
               throw new Error(`Invalid data format: expected 13 values, got ${values.length}`);
             }
           } catch (error) {
-            console.error("Error processing WebSocket message:", error);
             if (error instanceof Error) {
               setErrorMessage(`Error processing data: ${error.message}`);
             }
@@ -151,18 +148,15 @@ const DataFetcher: React.FC<DataFetcherProps> = ({ onDataFetched }) => {
         };
         
         socket.onclose = (event) => {
-          console.log("WebSocket connection closed", event);
           setIsConnected(false);
           setErrorMessage("WebSocket connection closed");
         };
         
         socket.onerror = (error) => {
-          console.error("WebSocket error:", error);
           setIsConnected(false);
           setErrorMessage("WebSocket connection error");
         };
       } catch (error) {
-        console.error("Error setting up WebSocket:", error);
         setIsConnected(false);
         if (error instanceof Error) {
           setErrorMessage(`WebSocket setup error: ${error.message}`);
@@ -186,14 +180,6 @@ const DataFetcher: React.FC<DataFetcherProps> = ({ onDataFetched }) => {
 
   return (
     <div className="mt-4" hidden>
-      <div className={`status-indicator ${isConnected ? 'bg-green-500' : 'bg-red-500'} text-white p-2 rounded`}>
-        Status: {isConnected ? 'Connected' : 'Disconnected'}
-      </div>
-      {errorMessage && (
-        <div className="error-message bg-yellow-100 border border-yellow-400 text-yellow-700 p-2 mt-2 rounded text-sm">
-          Error: {errorMessage}
-        </div>
-      )}
       <div className="text-sm text-gray-600 mt-2">
         To enable the WebSocket connection, make sure your WebSocket server is running at ws://localhost:8080
       </div>

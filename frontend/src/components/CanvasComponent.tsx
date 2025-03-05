@@ -9,7 +9,7 @@ interface CanvasProps {
 
 const CanvasComponent: React.FC<CanvasProps> = ({ joystickX, joystickY, slider, light }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [drawing, setDrawing] = useState<boolean>(true);
+  const [drawing] = useState<boolean>(true);
   const [lineWidth, setLineWidth] = useState<number>(2);
   const [color, setColor] = useState<string>('#000000');
   const [prevX, setPrevX] = useState<number | null>(null);
@@ -83,16 +83,6 @@ const CanvasComponent: React.FC<CanvasProps> = ({ joystickX, joystickY, slider, 
     setPrevY(y);
   }, [joystickX, joystickY, drawing, lineWidth, color, prevX, prevY]);
 
-  const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    setPrevX(null);
-    setPrevY(null);
-  };
-
   return (
     <div className="canvas-container">
       <canvas 
@@ -100,20 +90,7 @@ const CanvasComponent: React.FC<CanvasProps> = ({ joystickX, joystickY, slider, 
         className="border border-gray-300 rounded-md" 
         style={{ width: '100%', height: '400px' }}
       />
-      <div className="controls mt-2 flex justify-between">
-        <button 
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-          onClick={() => setDrawing(!drawing)}
-        >
-          {drawing ? 'Pause' : 'Resume'} Drawing
-        </button>
-        <button 
-          className="px-4 py-2 bg-red-500 text-white rounded"
-          onClick={clearCanvas}
-        >
-          Clear
-        </button>
-      </div>
+
     </div>
   );
 };

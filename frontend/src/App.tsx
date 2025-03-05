@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import CanvasComponent from "./CanvasComponent";
+import CanvasComponent from "./components/CanvasComponent";
 import Footer from "./Footer";
-import DataFetcher from "./DataFetcher";
+import DataFetcher from "./hooks/DataFetcher";
 
 const sensorNames = [
   "Joystick X",
