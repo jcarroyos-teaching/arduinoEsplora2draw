@@ -5,9 +5,16 @@
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: 1.6;
-  color: antiquewhite;
   background-color: rgb(24, 24, 24);
 }
 .h-64 {
   height: 11rem;
+}
+#sensor-data {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-gap: 0.5rem;
+  background-color: rgb(218, 218, 162);
+  border-radius: 10px;
+  padding: 20px;
 }

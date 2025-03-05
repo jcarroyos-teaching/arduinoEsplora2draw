@@ -1,66 +1,69 @@
 import React, { useState } from "react";
-import axios from "axios";
 import CanvasComponent from "./CanvasComponent";
 import Footer from "./Footer";
 import DataFetcher from "./DataFetcher";
 
 const sensorNames = [
-  "data[0] = Joystick X",
-  "data[1] = Joystick Y",
-  "data[2] = Light",
-  "data[3] = Temperature",
-  "data[4] = Slider",
-  "data[5] = Microphone",
-  "data[6] = Accel X",
-  "data[7] = Accel Y",
-  "data[8] = Accel Z",
-  "data[9] = Button 1",
-  "data[10] = Button 2",
-  "data[11] = Button 3",
-  "data[12] = Button 4",
+  "Joystick X",
+  "Joystick Y",
+  "Light",
+  "Temperature",
+  "Slider",
+  "Microphone",
+  "Accel X",
+  "Accel Y",
+  "Accel Z",
+  "Button 1",
+  "Button 2",
+  "Button 3",
+  "Button 4",
 ];
 
 const App: React.FC = () => {
-  const [data, setData] = useState<string | null>(null);
+  const [sensorData, setSensorData] = useState<number[]>(Array(13).fill(0));
 
-  const fetchData = async () => {
-    try {
-      const response = await axios.get("http://localhost:4000/api/serial-data");
-      setData(response.data.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
+  const handleDataFetched = (
+    joystickX: number,
+    joystickY: number,
+    light: number,
+    slider: number,
+  ) => {
+    setSensorData((prev) => [
+      joystickX,
+      joystickY,
+      light,
+      prev[3], // Preserve temperature (if not received)
+      slider,
+      prev[5], // Preserve microphone data (if not received)
+      prev[6], // Preserve Accel X
+      prev[7], // Preserve Accel Y
+      prev[8], // Preserve Accel Z
+      prev[9], // Preserve Button 1
+      prev[10], // Preserve Button 2
+      prev[11], // Preserve Button 3
+      prev[12], // Preserve Button 4
+    ]);
   };
-
-  const parsedData = data ? data.split(",") : [];
-  const joystickX = parsedData.length > 0 ? parseInt(parsedData[0], 10) : 0;
-  const joystickY = parsedData.length > 1 ? parseInt(parsedData[1], 10) : 0;
-  const slider = parsedData.length > 4 ? parseInt(parsedData[4], 10) : 0;
-  const light = parsedData.length > 2 ? parseInt(parsedData[2], 10) : 0;
 
   return (
     <div className="container mx-auto max-w-3xl p-4 mt-8">
       <div className="mt-4 grid grid-cols-2 gap-4">
-        <div>
-          {parsedData.length > 0 && (
-            <div>
-              {parsedData.map((value, index) => (
-                <div key={index} className="mb-2">
-                  <strong>{sensorNames[index]}:</strong>{" "}
-                  <span className="text-pink-600">{value}</span>
-                </div>
-              ))}
+        <section id="sensor-data">
+          {sensorData.map((value, index) => (
+            <div key={index} className="mb-2">
+              <strong>{sensorNames[index]}:</strong>{" "}
+              <span className="text-pink-600">{value}</span>
             </div>
-          )}
-        </div>
+          ))}
+        </section>
         <div>
           <CanvasComponent
-            joystickX={joystickX}
-            joystickY={joystickY}
-            slider={slider}
-            light={light}
+            joystickX={sensorData[0]}
+            joystickY={sensorData[1]}
+            slider={sensorData[4]}
+            light={sensorData[2]}
           />
-          <DataFetcher onDataFetched={fetchData} />
+          <DataFetcher onDataFetched={handleDataFetched} />
         </div>
       </div>
       <Footer />

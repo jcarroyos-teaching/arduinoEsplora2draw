@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import axios from "axios";
 
 interface DataFetcherProps {
   onDataFetched: (
@@ -11,31 +10,48 @@ interface DataFetcherProps {
 }
 
 const DataFetcher: React.FC<DataFetcherProps> = ({ onDataFetched }) => {
-  const fetchData = async () => {
-    try {
-      const response = await axios.get("http://localhost:4000/api/serial-data");
-      const data = response.data.data.split(",");
-      const joystickX = parseInt(data[0], 10);
-      const joystickY = parseInt(data[1], 10);
-      const light = Math.min(Math.max(parseInt(data[2], 10), 0), 1024);
-      const slider = parseInt(data[4], 10);
-      onDataFetched(joystickX, joystickY, light, slider);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
-  }, []);
+    const socket = new WebSocket("ws://localhost:8080");
+
+    // When connection is established
+    socket.onopen = () => {
+      console.log("✅ WebSocket connected");
+    };
+
+    // When a message is received
+    socket.onmessage = (event) => {
+      try {
+        const data = event.data.split(",");
+        const joystickX = parseInt(data[0], 10);
+        const joystickY = parseInt(data[1], 10);
+        const light = Math.min(Math.max(parseInt(data[2], 10), 0), 1024);
+        const slider = parseInt(data[4], 10);
+        onDataFetched(joystickX, joystickY, light, slider);
+      } catch (error) {
+        console.error("⚠️ Error parsing WebSocket message:", error);
+      }
+    };
+
+    // Handle WebSocket errors
+    socket.onerror = (error) => {
+      console.error("❌ WebSocket error:", error);
+    };
+
+    // Handle WebSocket closing
+    socket.onclose = () => {
+      console.warn("🔌 WebSocket disconnected");
+    };
+
+    // Cleanup function to close WebSocket when component unmounts
+    return () => {
+      socket.close();
+    };
+  }, [onDataFetched]);
 
   return (
-    <button
-      onClick={fetchData}
-      className="border border-teal-400 text-stone-900 rounded px-4 py-2 bg-teal-400 active:bg-transparent active:text-teal-400 transition duration-300 mt-10"
-    >
-      📡 Obtener datos
-    </button>
+    <p className="text-teal-600 mt-10">
+      📡 Escuchando los sensores...
+    </p>
   );
 };
 
