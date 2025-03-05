@@ -1,52 +1,115 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from 'react';
 
-interface CanvasComponentProps {
+interface CanvasProps {
   joystickX: number;
   joystickY: number;
   slider: number;
   light: number;
 }
 
-const CanvasComponent: React.FC<CanvasComponentProps> = ({
-  joystickX,
-  joystickY,
-  slider,
-  light,
-}) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+const CanvasComponent: React.FC<CanvasProps> = ({ joystickX, joystickY, slider, light }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [drawing, setDrawing] = useState<boolean>(true);
+  const [lineWidth, setLineWidth] = useState<number>(2);
+  const [color, setColor] = useState<string>('#000000');
+  const [prevX, setPrevX] = useState<number | null>(null);
+  const [prevY, setPrevY] = useState<number | null>(null);
 
+  // Convert joystick values to canvas coordinates
+  const mapJoystickToCanvas = (canvas: HTMLCanvasElement) => {
+    // Map joystick values (typically -512 to 512) to canvas dimensions
+    const x = ((joystickX + 512) / 1024) * canvas.width;
+    const y = ((joystickY + 512) / 1024) * canvas.height;
+    return { x, y };
+  };
+
+  // Update line width based on slider value
+  useEffect(() => {
+    // Map slider (0-1023) to a reasonable line width (1-20)
+    const newLineWidth = Math.max(1, Math.min(20, Math.floor(slider / 50)));
+    setLineWidth(newLineWidth);
+  }, [slider]);
+
+  // Update color based on light value
+  useEffect(() => {
+    // Map light (0-1023) to hue (0-360)
+    const hue = Math.floor((light / 1023) * 360);
+    setColor(`hsl(${hue}, 100%, 50%)`);
+  }, [light]);
+
+  // Drawing logic
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
+    if (!canvas) return;
 
-        // Clear the canvas
-        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-        // Map joystick values to canvas coordinates
-        const x = ((512 - joystickX) / 1024) * canvasWidth;
-        const y = ((512 + joystickY) / 1024) * canvasHeight;
+    // Set canvas size to match its display size
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
 
-        // Map light value to opacity (0 to 1)
-        const opacity = Math.min(Math.max(light / 1023, 0), 1);
+    // Configure drawing settings
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = color;
 
-        // Draw the point
-        ctx.beginPath();
-        ctx.arc(x, y, slider / 20, 0, 2 * Math.PI);
-        ctx.fillStyle = `rgba(235, 0, 167, ${opacity})`;
-        ctx.fill();
-      }
+    // Get current coordinates
+    const { x, y } = mapJoystickToCanvas(canvas);
+
+    // Start drawing if this is the first point
+    if (prevX === null || prevY === null) {
+      setPrevX(x);
+      setPrevY(y);
+      return;
     }
-  }, [joystickX, joystickY, slider, light]);
+
+    // Only draw if drawing is enabled
+    if (drawing) {
+      ctx.beginPath();
+      ctx.moveTo(prevX, prevY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+
+    // Update previous coordinates
+    setPrevX(x);
+    setPrevY(y);
+  }, [joystickX, joystickY, drawing, lineWidth, color, prevX, prevY]);
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setPrevX(null);
+    setPrevY(null);
+  };
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="border border-gray-300 w-full h-64"
-    ></canvas>
+    <div className="canvas-container">
+      <canvas 
+        ref={canvasRef} 
+        className="border border-gray-300 rounded-md" 
+        style={{ width: '100%', height: '400px' }}
+      />
+      <div className="controls mt-2 flex justify-between">
+        <button 
+          className="px-4 py-2 bg-blue-500 text-white rounded"
+          onClick={() => setDrawing(!drawing)}
+        >
+          {drawing ? 'Pause' : 'Resume'} Drawing
+        </button>
+        <button 
+          className="px-4 py-2 bg-red-500 text-white rounded"
+          onClick={clearCanvas}
+        >
+          Clear
+        </button>
+      </div>
+    </div>
   );
 };
 

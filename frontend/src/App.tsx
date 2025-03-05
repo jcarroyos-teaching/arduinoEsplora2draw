@@ -26,22 +26,31 @@ const App: React.FC = () => {
     joystickX: number,
     joystickY: number,
     light: number,
+    temperature: number,
     slider: number,
+    microphone: number,
+    accelX: number,
+    accelY: number,
+    accelZ: number,
+    button1: number,
+    button2: number,
+    button3: number,
+    button4: number
   ) => {
-    setSensorData((prev) => [
+    setSensorData([
       joystickX,
       joystickY,
       light,
-      prev[3], // Preserve temperature (if not received)
+      temperature,
       slider,
-      prev[5], // Preserve microphone data (if not received)
-      prev[6], // Preserve Accel X
-      prev[7], // Preserve Accel Y
-      prev[8], // Preserve Accel Z
-      prev[9], // Preserve Button 1
-      prev[10], // Preserve Button 2
-      prev[11], // Preserve Button 3
-      prev[12], // Preserve Button 4
+      microphone,
+      accelX,
+      accelY,
+      accelZ,
+      button1,
+      button2,
+      button3,
+      button4,
     ]);
   };
 
