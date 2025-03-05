@@ -1,6 +1,7 @@
 # arduinoEsplora2draw
 
-![image](https://github.com/user-attachments/assets/692d6139-aa9a-47a0-95a0-76d4a504d3e6)
+![Vite-React-TS](https://github.com/user-attachments/assets/5a6a0714-d76d-468c-af55-76c7d9a376e0)
+
 
 ## Instructions
 
